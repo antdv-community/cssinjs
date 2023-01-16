@@ -1,0 +1,25 @@
+{
+  "name": "@antd-tiny-vue/cssinjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "aibayanyu",
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/hash": "^0.9.0",
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@mistjs/eslint-config-vue": "^0.0.3",
+    "@mistjs/tsconfig": "^1.0.0",
+    "@mistjs/tsconfig-vue": "^0.0.3",
+    "eslint": "^8.32.0",
+    "typescript": "^4.9.4",
+    "unbuild": "^1.1.1"
+  }
+}
