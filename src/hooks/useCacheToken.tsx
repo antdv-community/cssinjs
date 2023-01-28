@@ -1,5 +1,6 @@
 import hash from '@emotion/hash'
-import { computed } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   ATTR_TOKEN,
   CSS_IN_JS_INSTANCE,
@@ -84,36 +85,35 @@ export default function useCacheToken<
   DerivativeToken = object,
   DesignToken = DerivativeToken,
 >(
-  theme: Theme<any, any>,
-  tokens: Partial<DesignToken>[],
-  option: Option<DerivativeToken> = {},
-): [DerivativeToken & { _tokenKey: string }, string] {
-  const { salt = '', override = EMPTY_OVERRIDE, formatToken } = option
-
+  theme: Ref<Theme<any, any>>,
+  tokens: Ref<Partial<DesignToken>[]>,
+  option: Ref<Option<DerivativeToken>> = ref({}),
+): ComputedRef<[(DerivativeToken & { _tokenKey: string }), string]> {
   // Basic - We do basic cache here
   // const mergedToken = React.useMemo(
   //   () => Object.assign({}, ...tokens),
   //   [tokens],
   // )
-  const mergedToken = computed(() => Object.assign({}, ...tokens))
+  const mergedToken = computed(() => Object.assign({}, ...tokens.value))
   // const tokenStr = React.useMemo(
   //   () => flattenToken(mergedToken),
   //   [mergedToken],
   // )
-  const tokenStr = computed(() => flattenToken(mergedToken))
+  const tokenStr = computed(() => flattenToken(mergedToken.value))
   // const overrideTokenStr = React.useMemo(
   //   () => flattenToken(override),
   //   [override],
   // )
-  const overrideTokenStr = computed(() => flattenToken(override))
+  const overrideTokenStr = computed(() => flattenToken(option.value.override ?? EMPTY_OVERRIDE))
 
   const cachedToken = useGlobalCache<
     [DerivativeToken & { _tokenKey: string }, string]
   >(
     'token',
-    [salt, theme.id, tokenStr.value, overrideTokenStr.value],
+    computed(() => [option.value.salt || '', theme.value.id, tokenStr.value, overrideTokenStr.value]),
     () => {
-      const derivativeToken = theme.getDerivativeToken(mergedToken)
+      const { salt = '', override = EMPTY_OVERRIDE, formatToken } = option.value
+      const derivativeToken = theme.value.getDerivativeToken(mergedToken)
 
       // Merge with override
       let mergedDerivativeToken = {
