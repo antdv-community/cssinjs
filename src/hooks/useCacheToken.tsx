@@ -113,7 +113,7 @@ export default function useCacheToken<
     computed(() => [option.value.salt || '', theme.value.id, tokenStr.value, overrideTokenStr.value]),
     () => {
       const { salt = '', override = EMPTY_OVERRIDE, formatToken } = option.value
-      const derivativeToken = theme.value.getDerivativeToken(mergedToken)
+      const derivativeToken = theme.value.getDerivativeToken(mergedToken.value)
 
       // Merge with override
       let mergedDerivativeToken = {

@@ -57,8 +57,8 @@ export default function useClientCache<CacheType>(
     },
     { immediate: true },
   )
-  onBeforeUnmount(() => {
-    clearCache(fullPath.value)
-  })
+  // onBeforeUnmount(() => {
+  //   clearCache(fullPath.value)
+  // })
   return computed(() => styleContext.cache.get(fullPath.value)![1])
 }
