@@ -12,7 +12,7 @@ export default defineComponent({
       default: 'default',
     },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const [theme, token, hashId] = useToken()
     const prefixCls = 'ant-btn'
     const registerParam = computed(() => {
@@ -23,23 +23,22 @@ export default defineComponent({
         path: [prefixCls],
       }
     })
-
+    const defaultCls = `${prefixCls}-default`
+    const primaryCls = `${prefixCls}-primary`
+    const ghostCls = `${prefixCls}-ghost`
+    const wrapSSR = useStyleRegister(registerParam, () => [
+      genDefaultButtonStyle(defaultCls, token.value),
+      genPrimaryButtonStyle(primaryCls, token.value),
+      genGhostButtonStyle(ghostCls, token.value),
+    ])
     return () => {
-      const defaultCls = `${prefixCls}-default`
-      const primaryCls = `${prefixCls}-primary`
-      const ghostCls = `${prefixCls}-ghost`
-      const wrapSSR = useStyleRegister(registerParam, () => [
-        genDefaultButtonStyle(defaultCls, token.value),
-        genPrimaryButtonStyle(primaryCls, token.value),
-        genGhostButtonStyle(ghostCls, token.value),
-      ])
       const typeCls: any = {
         [defaultCls]: props.type === 'default',
         [primaryCls]: props.type === 'primary',
         [ghostCls]: props.type === 'ghost',
       }
       const className = slots?.class
-      return (wrapSSR(<button class={classNames(prefixCls, typeCls, hashId.value, className)}>
+      return (wrapSSR(<button class={classNames(prefixCls, typeCls, hashId.value, className)} {...attrs}>
         {slots?.default?.()}
       </button>))
     }

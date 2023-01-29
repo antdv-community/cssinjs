@@ -367,7 +367,6 @@ export default function useStyleRegister(
         removeCSS(styleId, { mark: ATTR_MARK })
     },
   )
-  console.log(cacheStyle)
 
   return (node: VNodeChild) => {
     let styleNode: VNodeChild

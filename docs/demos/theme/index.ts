@@ -22,7 +22,7 @@ export interface DerivativeToken extends DesignToken {
   primaryColorDisabled: string
 }
 
-const defaultDesignToken: DesignToken = {
+export const defaultDesignToken: DesignToken = {
   primaryColor: '#1890ff',
   textColor: '#333333',
   reverseTextColor: '#FFFFFF',
@@ -49,12 +49,12 @@ export const useThemeContext = () => {
   return computed(() => unref(theme))
 }
 
-export const DesignTokenContext: InjectionKey<{
+export const DesignTokenContextKey: InjectionKey<{
   token?: Ref< Partial<DesignToken>>
-  hashed?: Ref< string | boolean>
+  hashed?: Ref<string | boolean | undefined>
 }> = Symbol('DesignTokenContext')
 export const useDesignTokenContext = () => {
-  return inject(DesignTokenContext, {
+  return inject(DesignTokenContextKey, {
     token: ref(defaultDesignToken),
   })
 }
@@ -75,7 +75,12 @@ export function useToken(): [ComputedRef<Theme<any, any>>, ComputedRef<Derivativ
       salt: salt.value,
     })),
   )
-  const token = computed(() => cacheToken.value[0])
-  const hashed = computed(() => cacheToken.value[1] ?? '')
+  const token = computed(() => {
+    return cacheToken.value[0] ?? {}
+  })
+  const hashed = computed(() => {
+    return cacheToken.value[1]
+    return cacheToken.value[1] ?? {}
+  })
   return [theme, token, hashed]
 }
