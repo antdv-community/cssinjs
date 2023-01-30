@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { DesignToken } from './theme'
 import DesignTokenContext from './components/DesignTokenContext.vue'
 import Button from './components/button'
+import Spin from './components/spin'
 
 const randomColor = () =>
     `#${Math.floor(Math.random() * 16777215)
@@ -17,10 +18,11 @@ const changeColor = () => {
 </script>
 
 <template>
-  <DesignTokenContext :token="dynamicTheme">
+  <DesignTokenContext :token="dynamicTheme" :hashed="true">
     <Button type="primary" @click="changeColor">
       随机颜色设置
     </Button>
+    <Spin />
   </DesignTokenContext>
 </template>
 
