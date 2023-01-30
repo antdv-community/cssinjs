@@ -1,8 +1,8 @@
 import type { ComputedRef, Ref } from 'vue'
-import { computed, watch } from 'vue'
+import { computed, onBeforeUnmount, watch } from 'vue'
 import { useStyleContext } from '../StyleContext'
 import type { KeyType } from '../Cache'
-import eagerComputed from '../utils/eagerComputed'
+import { checkIsSetup } from '../utils/checkIsSetup'
 import useHMR from './useHMR'
 
 export default function useClientCache<CacheType>(
@@ -13,11 +13,9 @@ export default function useClientCache<CacheType>(
 ): ComputedRef<CacheType> {
   const styleContext = useStyleContext()
   const fullPath = computed(() => {
-    console.log('computed fullPath', keyPath.value)
     return [prefix, ...keyPath.value]
   })
-  const fullPathStr = eagerComputed(() => {
-    console.log('eagerComputed fullPathStr', fullPath.value)
+  const fullPathStr = computed(() => {
     return fullPath.value.join('-')
   })
 
@@ -39,7 +37,6 @@ export default function useClientCache<CacheType>(
   watch(
     () => fullPath.value,
     (_, oldValue) => {
-      console.log('watch fullPath', fullPath.value)
       clearCache(oldValue)
     },
   )
@@ -47,7 +44,6 @@ export default function useClientCache<CacheType>(
   watch(
     fullPathStr,
     () => {
-      console.log('watch fullPathStr', fullPath.value)
       styleContext.cache.update(fullPath.value, (prevCache) => {
         const [times = 0, cache] = prevCache || []
 
@@ -65,12 +61,14 @@ export default function useClientCache<CacheType>(
     },
     { immediate: true },
   )
-  // onBeforeUnmount(() => {
-  //   clearCache(fullPath.value)
-  // })
+  checkIsSetup(() => {
+    onBeforeUnmount(() => {
+      clearCache(fullPath.value)
+    })
+  })
+
   return computed(() => {
     const data = styleContext.cache.get(fullPath.value)
-    console.log(data, fullPath)
     const [, cache] = data || []
     return cache
   })
