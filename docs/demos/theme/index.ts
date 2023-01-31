@@ -76,11 +76,11 @@ export function useToken(): [ComputedRef<Theme<any, any>>, ComputedRef<Derivativ
     })),
   )
   const token = computed(() => {
-    return cacheToken.value[0] ?? {}
+    return cacheToken.value?.[0] ?? {}
   })
   const hashed = computed(() => {
-    return cacheToken.value[1]
-    return cacheToken.value[1] ?? {}
+    return cacheToken.value?.[1]
+    return cacheToken.value?.[1] ?? {}
   })
   return [theme, token, hashed]
 }

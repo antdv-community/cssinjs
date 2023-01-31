@@ -22,7 +22,10 @@ const changeColor = () => {
     <Button type="primary" @click="changeColor">
       随机颜色设置
     </Button>
-    <Spin />
+    <Button type="primary" @click="changeColor">
+      随机颜色设置
+    </Button>
+    <!--    <Spin /> -->
   </DesignTokenContext>
 </template>
 
