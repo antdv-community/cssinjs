@@ -1,6 +1,8 @@
 import hash from '@emotion/hash'
+import type { ComputedRef, Ref } from 'vue'
 import canUseDom from './utils/canUseDom'
 import { removeCSS, updateCSS } from './utils/dynamicCSS'
+export type MaybeComputedRef<T> = Ref<T> | ComputedRef<T>
 
 export function flattenToken(token: any) {
   let str = ''

@@ -1,11 +1,7 @@
 import hash from '@emotion/hash'
-import type { ComputedRef, Ref } from 'vue'
+import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
-import {
-  ATTR_TOKEN,
-  CSS_IN_JS_INSTANCE,
-  CSS_IN_JS_INSTANCE_ID,
-} from '../StyleContext'
+import { ATTR_TOKEN, CSS_IN_JS_INSTANCE, CSS_IN_JS_INSTANCE_ID } from '../StyleContext'
 import type Theme from '../theme/Theme'
 import { flattenToken, token2key } from '../util'
 import useGlobalCache from './useGlobalCache'
@@ -14,10 +10,7 @@ const EMPTY_OVERRIDE = {}
 
 // Generate different prefix to make user selector break in production env.
 // This helps developer not to do style override directly on the hash id.
-const hashPrefix
-  = process.env.NODE_ENV !== 'production'
-    ? 'css-dev-only-do-not-override'
-    : 'css'
+const hashPrefix = process.env.NODE_ENV !== 'production' ? 'css-dev-only-do-not-override' : 'css'
 
 export interface Option<DerivativeToken> {
   /**
@@ -81,36 +74,24 @@ function cleanTokenStyle(tokenKey: string) {
  * @param option Additional config
  * @returns Call Theme.getDerivativeToken(tokenObject) to get token
  */
-export default function useCacheToken<
-  DerivativeToken = object,
-  DesignToken = DerivativeToken,
->(
+export default function useCacheToken<DerivativeToken = object, DesignToken = DerivativeToken>(
   theme: Ref<Theme<any, any>>,
   tokens: Ref<Partial<DesignToken>[]>,
   option: Ref<Option<DerivativeToken>> = ref({}),
-): ComputedRef<[(DerivativeToken & { _tokenKey: string }), string]> {
+) {
   // Basic - We do basic cache here
-  // const mergedToken = React.useMemo(
-  //   () => Object.assign({}, ...tokens),
-  //   [tokens],
-  // )
   const mergedToken = computed(() => Object.assign({}, ...tokens.value))
-  // const tokenStr = React.useMemo(
-  //   () => flattenToken(mergedToken),
-  //   [mergedToken],
-  // )
   const tokenStr = computed(() => flattenToken(mergedToken.value))
-  // const overrideTokenStr = React.useMemo(
-  //   () => flattenToken(override),
-  //   [override],
-  // )
-  const overrideTokenStr = computed(() => flattenToken(option.value.override ?? EMPTY_OVERRIDE))
+  const overrideTokenStr = computed(() => flattenToken(option.value.override || EMPTY_OVERRIDE))
 
-  const cachedToken = useGlobalCache<
-    [DerivativeToken & { _tokenKey: string }, string]
-  >(
+  const cachedToken = useGlobalCache<[DerivativeToken & { _tokenKey: string }, string]>(
     'token',
-    computed(() => [option.value.salt || '', theme.value.id, tokenStr.value, overrideTokenStr.value]),
+    computed(() => [
+      option.value.salt || '',
+      theme.value.id,
+      tokenStr.value,
+      overrideTokenStr.value,
+    ]),
     () => {
       const { salt = '', override = EMPTY_OVERRIDE, formatToken } = option.value
       const derivativeToken = theme.value.getDerivativeToken(mergedToken.value)

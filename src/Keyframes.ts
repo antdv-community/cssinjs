@@ -1,7 +1,7 @@
 import type { CSSInterpolation } from './hooks/useStyleRegister'
 
 class Keyframe {
-  private readonly name: string
+  private name: string
   style: CSSInterpolation
 
   constructor(name: string, style: CSSInterpolation) {

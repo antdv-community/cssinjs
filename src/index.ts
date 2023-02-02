@@ -3,8 +3,8 @@ import type { CSSInterpolation, CSSObject } from './hooks/useStyleRegister'
 import useStyleRegister, { extractStyle } from './hooks/useStyleRegister'
 import Keyframes from './Keyframes'
 import type { Linter } from './linters'
-import { logicalPropertiesLinter } from './linters'
-import { StyleProvider, createCache } from './StyleContext'
+import { legacyNotSelectorLinter, logicalPropertiesLinter, parentSelectorLinter } from './linters'
+import { createCache, useStyleInject, useStyleProvider } from './StyleContext'
 import type { DerivativeFunc, TokenType } from './theme'
 import { Theme, createTheme } from './theme'
 import type { Transformer } from './transformers/interface'
@@ -16,7 +16,8 @@ export {
   useStyleRegister,
   useCacheToken,
   createCache,
-  StyleProvider,
+  useStyleInject,
+  useStyleProvider,
   Keyframes,
   extractStyle,
 
@@ -25,12 +26,7 @@ export {
 
   // Linters
   logicalPropertiesLinter,
+  legacyNotSelectorLinter,
+  parentSelectorLinter,
 }
-export type {
-  TokenType,
-  CSSObject,
-  CSSInterpolation,
-  DerivativeFunc,
-  Transformer,
-  Linter,
-}
+export type { TokenType, CSSObject, CSSInterpolation, DerivativeFunc, Transformer, Linter }

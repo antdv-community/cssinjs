@@ -6,7 +6,7 @@ export default function eagerComputed<T>(fn: ComputedGetter<T>) {
   watchEffect(
     () => {
       result.value = fn()
-      console.log('watchEffect', result)
+      // console.log('watchEffect', result)
     },
     {
       flush: 'sync', // needed so updates are immediate.

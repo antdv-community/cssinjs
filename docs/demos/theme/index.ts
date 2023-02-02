@@ -3,6 +3,7 @@ import { computed, inject, ref, unref } from 'vue'
 import { TinyColor } from '@ctrl/tinycolor'
 import type { CSSObject, Theme } from '../../../src'
 import { createTheme, useCacheToken } from '../../../src'
+import type { MaybeComputedRef } from '../../../src/util'
 
 export type GetStyle = (prefixCls: string, token: DerivativeToken) => CSSObject
 
@@ -59,7 +60,7 @@ export const useDesignTokenContext = () => {
   })
 }
 
-export function useToken(): [ComputedRef<Theme<any, any>>, ComputedRef<DerivativeToken>, ComputedRef<string>] {
+export function useToken(): [MaybeComputedRef<Theme<any, any>>, ComputedRef<DerivativeToken>, ComputedRef<string>] {
   const designTokenContext
         = useDesignTokenContext()
   const theme = useThemeContext()
@@ -76,11 +77,10 @@ export function useToken(): [ComputedRef<Theme<any, any>>, ComputedRef<Derivativ
     })),
   )
   const token = computed(() => {
-    return cacheToken.value?.[0] ?? {}
+    return cacheToken.value?.[0]
   })
   const hashed = computed(() => {
     return cacheToken.value?.[1]
-    return cacheToken.value?.[1] ?? {}
   })
   return [theme, token, hashed]
 }

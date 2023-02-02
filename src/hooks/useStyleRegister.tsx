@@ -16,12 +16,13 @@ import {
   ATTR_TOKEN,
   CSS_IN_JS_INSTANCE,
   CSS_IN_JS_INSTANCE_ID,
-  useStyleContext,
+  useStyleInject,
 } from '../StyleContext'
 import { supportLayer } from '../util'
 import canUseDom from '../utils/canUseDom'
 import { removeCSS, updateCSS } from '../utils/dynamicCSS'
 import useGlobalCache from './useGlobalCache'
+export type VueNode = VNodeChild
 
 const isClientSide = canUseDom()
 
@@ -112,7 +113,7 @@ const globalEffectStyleKeys = new Set()
  * @private Test only. Clear the global effect style keys.
  */
 export const _cf
-    = process.env.NODE_ENV !== 'production' ? () => globalEffectStyleKeys.clear() : undefined
+  = process.env.NODE_ENV !== 'production' ? () => globalEffectStyleKeys.clear() : undefined
 
 // Parse CSSObject to style content
 export const parseStyle = (
@@ -124,7 +125,7 @@ export const parseStyle = (
   },
 ): [
   parsedStr: string,
-  // Style content which should be unique on all the style (e.g. Keyframes).
+  // Style content which should be unique on all of the style (e.g. Keyframes).
   // Firefox will flick with same animation name when exist multiple same keyframes.
   effectStyle: Record<string, string>,
 ] => {
@@ -179,9 +180,9 @@ export const parseStyle = (
 
         if (
           typeof value === 'object'
-            && value
-            && (key !== 'animationName' || !(value as Keyframes)._keyframe)
-            && !isCompoundCSSProperty(value)
+          && value
+          && (key !== 'animationName' || !(value as Keyframes)._keyframe)
+          && !isCompoundCSSProperty(value)
         ) {
           let subInjectHash = false
 
@@ -228,7 +229,7 @@ export const parseStyle = (
           const actualValue = (value as any)?.value ?? value
           if (
             process.env.NODE_ENV !== 'production'
-              && (typeof value !== 'object' || !(value as any)?.[SKIP_CHECK])
+            && (typeof value !== 'object' || !(value as any)?.[SKIP_CHECK])
           ) {
             [contentQuotesLinter, hashedAnimationLinter, ...linters].forEach(linter =>
               linter(key, actualValue, { path, hashId, parentSelectors }),
@@ -297,13 +298,13 @@ export default function useStyleRegister(
   }>,
   styleFn: () => CSSInterpolation,
 ) {
-  const styleContext = useStyleContext()
+  const styleContext = useStyleInject()
 
   const tokenKey = computed(() => info.value.token._tokenKey as string)
 
   const fullPath = computed(() => [tokenKey.value, ...info.value.path])
 
-  // Check if you need insert style
+  // Check if need insert style
   let isMergedClientSide = isClientSide
   if (process.env.NODE_ENV !== 'production' && styleContext.mock !== undefined)
     isMergedClientSide = styleContext.mock === 'client'
@@ -368,28 +369,28 @@ export default function useStyleRegister(
     },
   )
 
-  return (node: VNodeChild) => {
-    let styleNode: VNodeChild
+  return (node: VueNode) => {
+    let styleNode: VueNode
     if (!styleContext.ssrInline || isMergedClientSide || !styleContext.defaultCache) {
       styleNode = <Empty />
     }
     else {
       styleNode = (
-          <style
-              {...{
-                [ATTR_TOKEN]: cacheStyle.value[1],
-                [ATTR_MARK]: cacheStyle.value[2],
-              }}
-              innerHTML={cacheStyle.value[0]}
-          />
+        <style
+          {...{
+            [ATTR_TOKEN]: cacheStyle.value[1],
+            [ATTR_MARK]: cacheStyle.value[2],
+          }}
+          innerHTML={cacheStyle.value[0]}
+        />
       )
     }
 
     return (
-        <>
-          {styleNode}
-          {node}
-        </>
+      <>
+        {styleNode}
+        {node}
+      </>
     )
   }
 }
