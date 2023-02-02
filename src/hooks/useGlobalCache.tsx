@@ -12,7 +12,9 @@ export default function useClientCache<CacheType>(
   onCacheRemove?: (cache: CacheType, fromHMR: boolean) => void,
 ): ComputedRef<CacheType> {
   const styleContext = useStyleInject()
-  const fullPath = computed(() => [prefix, ...keyPath.value])
+  const fullPath = computed(() => {
+    return [prefix, ...keyPath.value]
+  })
   const fullPathStr = eagerComputed(() => fullPath.value.join('_'))
   const HMRUpdate = useHMR()
   const clearCache = (paths: typeof fullPath.value) => {

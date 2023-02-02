@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
-import { provide, toRefs } from 'vue'
+import { provide } from 'vue'
 import type { DesignToken } from '../theme'
 import { DesignTokenContextKey, defaultDesignToken } from '../theme'
 
@@ -15,7 +15,7 @@ const props = defineProps({
   },
 })
 
-provide(DesignTokenContextKey, toRefs(props))
+provide(DesignTokenContextKey, props)
 </script>
 
 <template>

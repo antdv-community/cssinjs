@@ -16,7 +16,6 @@ export default defineComponent({
     const prefixCls = 'ant-btn'
     const [theme, token, hashId] = useToken()
     const registerParam = computed(() => {
-      console.log(token, 'token')
       return {
         theme: theme.value,
         token: token.value,

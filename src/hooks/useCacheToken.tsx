@@ -80,18 +80,26 @@ export default function useCacheToken<DerivativeToken = object, DesignToken = De
   option: Ref<Option<DerivativeToken>> = ref({}),
 ) {
   // Basic - We do basic cache here
-  const mergedToken = computed(() => Object.assign({}, ...tokens.value))
-  const tokenStr = computed(() => flattenToken(mergedToken.value))
-  const overrideTokenStr = computed(() => flattenToken(option.value.override || EMPTY_OVERRIDE))
+  const mergedToken = computed(() => {
+    return Object.assign({}, ...tokens.value)
+  })
+  const tokenStr = computed(() => {
+    return flattenToken(mergedToken.value)
+  })
+  const overrideTokenStr = computed(() => {
+    return flattenToken(option.value.override || EMPTY_OVERRIDE)
+  })
 
-  const cachedToken = useGlobalCache<[DerivativeToken & { _tokenKey: string }, string]>(
+  return useGlobalCache<[DerivativeToken & { _tokenKey: string }, string]>(
     'token',
-    computed(() => [
-      option.value.salt || '',
-      theme.value.id,
-      tokenStr.value,
-      overrideTokenStr.value,
-    ]),
+    computed(() => {
+      return [
+        option.value.salt || '',
+        theme.value.id,
+        tokenStr.value,
+        overrideTokenStr.value,
+      ]
+    }),
     () => {
       const { salt = '', override = EMPTY_OVERRIDE, formatToken } = option.value
       const derivativeToken = theme.value.getDerivativeToken(mergedToken.value)
@@ -121,6 +129,4 @@ export default function useCacheToken<DerivativeToken = object, DesignToken = De
       cleanTokenStyle(cache[0]._tokenKey)
     },
   )
-
-  return cachedToken
 }

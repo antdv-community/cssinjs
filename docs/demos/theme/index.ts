@@ -1,5 +1,5 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
-import { computed, inject, ref, unref } from 'vue'
+import { computed, inject } from 'vue'
 import { TinyColor } from '@ctrl/tinycolor'
 import type { CSSObject, Theme } from '../../../src'
 import { createTheme, useCacheToken } from '../../../src'
@@ -44,43 +44,35 @@ function derivative(designToken: DesignToken): DerivativeToken {
   }
 }
 
-export const ThemeContext = Symbol('ThemeContext')
-export const useThemeContext = () => {
-  const theme = inject(ThemeContext, createTheme(derivative))
-  return computed(() => unref(theme))
-}
+const defaultTheme = createTheme(derivative)
 
 export const DesignTokenContextKey: InjectionKey<{
-  token?: Ref< Partial<DesignToken>>
-  hashed?: Ref<string | boolean | undefined>
+  token?: Partial<DesignToken>
+  hashed?: string | boolean | undefined
+  theme?: Theme<any, any>
 }> = Symbol('DesignTokenContext')
-export const useDesignTokenContext = () => {
-  return inject(DesignTokenContextKey, {
-    token: ref(defaultDesignToken),
-  })
+export const defaultConfig = {
+  token: defaultDesignToken,
+  hashed: true,
 }
 
 export function useToken(): [MaybeComputedRef<Theme<any, any>>, ComputedRef<DerivativeToken>, ComputedRef<string>] {
-  const designTokenContext
-        = useDesignTokenContext()
-  const theme = useThemeContext()
-  const salt = computed(() => typeof designTokenContext.hashed?.value === 'string' ? designTokenContext.hashed?.value : '')
-  const tokens = computed<DesignToken[]>(() => ([
-    defaultDesignToken,
-    designTokenContext.token?.value || [],
-  ] as DesignToken[]))
-  const cacheToken = useCacheToken<DerivativeToken, DesignToken>(
-    theme,
-    tokens,
+  const designTokenContext = inject(DesignTokenContextKey, defaultConfig)
+  const salt = computed(() => `${designTokenContext.hashed || ''}`)
+
+  const mergedTheme = computed(() => designTokenContext.theme || defaultTheme)
+  const cacheToken = useCacheToken<DesignToken, DerivativeToken>(
+    mergedTheme,
+    computed(() => {
+      return [defaultDesignToken, designTokenContext.token]
+    }) as Ref<DesignToken[]>,
     computed(() => ({
       salt: salt.value,
     })),
   )
-  const token = computed(() => {
-    return cacheToken.value?.[0]
-  })
-  const hashed = computed(() => {
-    return cacheToken.value?.[1]
-  })
-  return [theme, token, hashed]
+  return [
+    mergedTheme,
+    computed(() => cacheToken.value[0]) as any,
+    computed(() => (designTokenContext.hashed ? cacheToken.value[1] : '')),
+  ]
 }

@@ -19,9 +19,9 @@ const changeColor = () => {
 
 <template>
   <DesignTokenContext :token="dynamicTheme" :hashed="true">
-    <!--    <Button type="primary" @click="changeColor"> -->
-    <!--      随机颜色设置 -->
-    <!--    </Button> -->
+    <Button type="primary" @click="changeColor">
+      随机颜色设置
+    </Button>
     <Button type="primary" @click="changeColor">
       随机颜色设置
     </Button>
