@@ -37,12 +37,11 @@ const Spin = defineComponent({
     const registerInfo = computed(() => {
       return { theme: theme.value, token: token.value, hashId: hashId.value, path: [prefixCls] }
     })
-
+    const wrapSSR = useStyleRegister(
+      registerInfo,
+      () => [genSpinStyle(prefixCls, token.value, hashId.value)],
+    )
     return () => {
-      const wrapSSR = useStyleRegister(
-        registerInfo,
-        () => [genSpinStyle(prefixCls, token.value, hashId.value)],
-      )
       return wrapSSR(
         <div {...attrs} class={classNames(prefixCls, hashId.value)} />,
       )

@@ -1,8 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
-import { computed, onBeforeUnmount, watch } from 'vue'
+import { computed, onBeforeUnmount, shallowRef, watch, watchSyncEffect } from 'vue'
 import { useStyleInject } from '../StyleContext'
 import type { KeyType } from '../Cache'
-import eagerComputed from '../utils/eagerComputed'
 import useHMR from './useHMR'
 
 export default function useClientCache<CacheType>(
@@ -12,11 +11,13 @@ export default function useClientCache<CacheType>(
   onCacheRemove?: (cache: CacheType, fromHMR: boolean) => void,
 ): ComputedRef<CacheType> {
   const styleContext = useStyleInject()
+  const fullPathStr = shallowRef('')
+
   const fullPath = computed(() => {
     return [prefix, ...keyPath.value]
   })
-  const fullPathStr = eagerComputed(() => fullPath.value.join('_'))
-  const HMRUpdate = useHMR()
+  const oldPath = shallowRef([...fullPath.value])
+
   const clearCache = (paths: typeof fullPath.value) => {
     styleContext.cache.update(paths, (prevCache) => {
       const [times = 0, cache] = prevCache || []
@@ -30,36 +31,53 @@ export default function useClientCache<CacheType>(
       return [times - 1, cache]
     })
   }
-  watch(
-    () => fullPath.value.slice(),
-    (_, oldValue) => {
-      clearCache(oldValue)
-    },
-  )
+
+  watchSyncEffect(() => {
+    const newPath = fullPath.value.join('_')
+    if (newPath !== fullPathStr.value) {
+      clearCache(oldPath.value)
+      fullPathStr.value = fullPath.value.join('_')
+      oldPath.value = [...fullPath.value]
+    }
+  })
+
+  const HMRUpdate = useHMR()
+
+  const flush = () => {
+    styleContext.cache.update(fullPath.value, (prevCache) => {
+      const [times = 0, cache] = prevCache || []
+
+      // HMR should always ignore cache since developer may change it
+      let tmpCache = cache
+      if (process.env.NODE_ENV !== 'production' && cache && HMRUpdate) {
+        onCacheRemove?.(tmpCache, HMRUpdate)
+        tmpCache = null
+      }
+
+      const mergedCache = tmpCache || cacheFn()
+
+      return [times + 1, mergedCache]
+    })
+  }
   // Create cache
   watch(
     fullPathStr,
     () => {
-      styleContext.cache.update(fullPath.value, (prevCache) => {
-        const [times = 0, cache] = prevCache || []
-
-        // HMR should always ignore cache since developer may change it
-        let tmpCache = cache
-        if (process.env.NODE_ENV !== 'production' && cache && HMRUpdate) {
-          onCacheRemove?.(tmpCache, HMRUpdate)
-          tmpCache = null
-        }
-
-        const mergedCache = tmpCache || cacheFn()
-
-        return [times + 1, mergedCache]
-      })
+      flush()
     },
     { immediate: true },
   )
   onBeforeUnmount(() => {
     clearCache(fullPath.value)
   })
-  const val = computed(() => styleContext.cache.get(fullPath.value)![1])
+  const val = computed(() => {
+    const cache = styleContext.cache.get(fullPath.value)
+    if (!cache) {
+      flush()
+      const cache = styleContext.cache.get(fullPath.value)
+      return cache![1]
+    }
+    return cache[1]
+  })
   return val
 }
