@@ -22,11 +22,14 @@ const genSpinStyle = (
       width: 20,
       height: 20,
       backgroundColor: token.primaryColor,
-
-      animation: `${animation.getName(hashId)} 1s infinite linear`,
+      animationName: animation,
+      animationDuration: '1.2s',
+      animationIterationCount: 'infinite',
+      animationTimingFunction: 'linear',
+      // animation: `${animation.getName(hashId)} 1s infinite linear`,
     },
   },
-  animation,
+  // animation,
 ]
 
 const Spin = defineComponent({
