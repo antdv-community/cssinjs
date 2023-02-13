@@ -6,4 +6,6 @@ import Demo2 from "./demos/demo2.vue"
 # 测试CSS
 
 
+<Demo1 />
+<br />
 <Demo2 />
