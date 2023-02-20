@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from 'vue'
-import { computed, onBeforeUnmount, shallowRef, watch, watchSyncEffect } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { useStyleInject } from '../StyleContext'
 import type { KeyType } from '../Cache'
 import useHMR from './useHMR'
@@ -16,7 +16,7 @@ export default function useClientCache<CacheType>(
   const fullPath = computed(() => {
     return [prefix, ...keyPath.value]
   })
-  const oldPath = shallowRef([...fullPath.value])
+  const cachePath = ref([...fullPath.value])
 
   const clearCache = (paths: typeof fullPath.value) => {
     styleContext.cache.update(paths, (prevCache) => {
@@ -32,13 +32,10 @@ export default function useClientCache<CacheType>(
     })
   }
 
-  watchSyncEffect(() => {
-    const newPath = fullPath.value.join('_')
-    if (newPath !== fullPathStr.value) {
-      clearCache(oldPath.value)
-      fullPathStr.value = fullPath.value.join('_')
-      oldPath.value = [...fullPath.value]
-    }
+  watch(() => fullPath.value.slice(), (newVal, oldValue) => {
+    clearCache(oldValue)
+    cachePath.value = newVal
+    fullPathStr.value = newVal.join('-')
   })
 
   const HMRUpdate = useHMR()
@@ -70,14 +67,8 @@ export default function useClientCache<CacheType>(
   onBeforeUnmount(() => {
     clearCache(fullPath.value)
   })
-  const val = computed(() => {
-    const cache = styleContext.cache.get(fullPath.value)
-    if (!cache) {
-      flush()
-      const cache = styleContext.cache.get(fullPath.value)
-      return cache![1]
-    }
-    return cache[1]
+  return computed(() => {
+    const cache = styleContext.cache.get(cachePath.value)
+    return cache![1]
   })
-  return val
 }
