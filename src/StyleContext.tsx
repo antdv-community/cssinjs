@@ -81,7 +81,7 @@ export const useStyleInject = () => {
     defaultCache: true,
   })
 }
-export const useStyleProvider = (props: StyleContextProps) => {
+export const useStyleProvider = (props: StyleProviderProps) => {
   const parentContext = useStyleInject()
 
   const context = computed<StyleContextProps>(() => {
