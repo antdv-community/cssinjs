@@ -6,7 +6,7 @@
 
 [![vitepress](https://img.shields.io/badge/docs%20by-vitepress-blue?style=flat-square)](https://github.com/vuejs/vitepress)
 
-[![build status][github-actions-image]][github-actions-url]
+[//]: # ([![build status][github-actions-image]][github-actions-url])
 
 [![Codecov][codecov-image]][codecov-url]
 
