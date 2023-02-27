@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "vite build",
-    "docs:dev": "vitepress dev docs",
+    "dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "test": "vitest"
   },
@@ -43,7 +43,7 @@
     "vite": "^4.0.4",
     "vite-plugin-dts": "^1.7.1",
     "vite-plugin-vitepress-demo": "2.0.0-alpha.8",
-    "vitepress": "1.0.0-alpha.40",
+    "vitepress": "1.0.0-alpha.48",
     "vitest": "^0.28.3"
   },
   "pnpm": {

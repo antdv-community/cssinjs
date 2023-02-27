@@ -4,7 +4,7 @@ import useStyleRegister, { extractStyle } from './hooks/useStyleRegister'
 import Keyframes from './Keyframes'
 import type { Linter } from './linters'
 import { legacyNotSelectorLinter, logicalPropertiesLinter, parentSelectorLinter } from './linters'
-import { createCache, useStyleInject, useStyleProvider } from './StyleContext'
+import { StyleProvider, createCache, useStyleInject, useStyleProvider } from './StyleContext'
 import type { DerivativeFunc, TokenType } from './theme'
 import { Theme, createTheme } from './theme'
 import type { Transformer } from './transformers/interface'
@@ -19,6 +19,7 @@ export {
   createCache,
   useStyleInject,
   useStyleProvider,
+  StyleProvider,
   Keyframes,
   extractStyle,
 

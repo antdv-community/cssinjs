@@ -1,5 +1,5 @@
-import type { InjectionKey, Ref } from 'vue'
-import { computed, inject, unref } from 'vue'
+import type { InjectionKey, PropType, Ref } from 'vue'
+import { computed, defineComponent, inject, provide, reactive, unref } from 'vue'
 import CacheEntity from './Cache'
 import type { Linter } from './linters'
 import type { Transformer } from './transformers/interface'
@@ -105,7 +105,37 @@ export const useStyleProvider = (props: StyleProviderProps) => {
   return context
 }
 
+export const StyleProvider = defineComponent({
+  props: {
+    autoClear: Boolean,
+    mock: String as PropType<StyleContextProps['mock']>,
+    cache: {
+      type: Object as PropType<StyleContextProps['cache']>,
+      default: () => createCache(),
+    },
+    hashPriority: {
+      type: String as PropType<StyleContextProps['hashPriority']>,
+      default: 'low',
+    },
+    container: Object as PropType<StyleContextProps['container']>,
+    ssrInline: Boolean,
+    transformers: Array as PropType<StyleContextProps['transformers']>,
+    linters: Array as PropType<StyleContextProps['linters']>,
+    defaultCache: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  setup(props, ctx) {
+    const context = reactive(useStyleProvider(props))
+    provide(StyleContextKey, context as StyleProviderProps)
+    return () => ctx.slots.default?.()
+  },
+})
+StyleProvider.displayName = 'StyleProvider'
+
 export default {
   useStyleInject,
   useStyleProvider,
+  StyleProvider,
 }
