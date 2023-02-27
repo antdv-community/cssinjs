@@ -1,6 +1,6 @@
 {
   "name": "@antd-tiny-vue/cssinjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -34,8 +34,10 @@
     "@types/node": "^18.11.18",
     "@types/stylis": "^4.0.2",
     "@vitejs/plugin-vue-jsx": "^3.0.0",
+    "@vue/test-utils": "^2.3.0",
     "classnames": "^2.3.2",
     "eslint": "^8.32.0",
+    "jsdom": "^21.1.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.4",
     "vite-plugin-dts": "^1.7.1",

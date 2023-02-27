@@ -9,6 +9,7 @@ import type { DerivativeFunc, TokenType } from './theme'
 import { Theme, createTheme } from './theme'
 import type { Transformer } from './transformers/interface'
 import legacyLogicalPropertiesTransformer from './transformers/legacyLogicalProperties'
+import px2remTransformer from './transformers/px2rem'
 
 export {
   Theme,
@@ -23,6 +24,7 @@ export {
 
   // Transformer
   legacyLogicalPropertiesTransformer,
+  px2remTransformer,
 
   // Linters
   logicalPropertiesLinter,

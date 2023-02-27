@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import dts from 'vite-plugin-dts'
@@ -21,5 +22,9 @@ export default defineConfig({
       formats: ['es', 'cjs'],
       fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
   },
 })
