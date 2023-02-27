@@ -37,7 +37,7 @@ Component level cssinjs solution used in [antd-tiny-vue](https://github.com/antd
 
 ```
 npm install
-npm start
+npm dev
 ```
 
 ## License
