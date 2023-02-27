@@ -14,10 +14,10 @@
 
 [npm-image]: http://img.shields.io/npm/v/@antd-tiny-vue/cssinjs.svg?style=flat-square
 [npm-url]: http://npmjs.org/package/@antd-tiny-vue/cssinjs
-[github-actions-image]: https://github.com/ant-design/cssinjs/workflows/CI/badge.svg
-[github-actions-url]: https://github.com/ant-design/cssinjs/actions
-[codecov-image]: https://img.shields.io/codecov/c/github/ant-design/cssinjs/master.svg?style=flat-square
-[codecov-url]: https://codecov.io/gh/ant-design/cssinjs/branch/master
+[github-actions-image]: https://github.com/antd-tiny-vue/cssinjs/workflows/CI/badge.svg
+[github-actions-url]: https://github.com/antd-tiny-vue/cssinjs/actions
+[codecov-image]: https://img.shields.io/codecov/c/github/antd-tiny-vue/cssinjs/master.svg?style=flat-square
+[codecov-url]: https://codecov.io/gh/antd-tiny-vue/cssinjs/branch/master
 [download-image]: https://img.shields.io/npm/dm/@antd-tiny-vue/cssinjs.svg?style=flat-square
 [download-url]: https://npmjs.org/package/@antd-tiny-vue/cssinjs
 [bundlephobia-url]: https://bundlephobia.com/result?p=@antd-tiny-vue/cssinjs
