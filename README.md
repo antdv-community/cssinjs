@@ -1,16 +1,7 @@
 # @antd-tiny-vue/cssinjs
 
-[![NPM version][npm-image]][npm-url] 
-
-[![npm download][download-image]][download-url] 
-
-[![vitepress](https://img.shields.io/badge/docs%20by-vitepress-blue?style=flat-square)](https://github.com/vuejs/vitepress)
-
-[//]: # ([![build status][github-actions-image]][github-actions-url])
-
-[![Codecov][codecov-image]][codecov-url]
-
-[![bundle size][bundlephobia-image]][bundlephobia-url]
+[![NPM version][npm-image]][npm-url] [![npm download][download-image]][download-url] 
+ [![vitepress](https://img.shields.io/badge/docs%20by-vitepress-blue?style=flat-square)](https://github.com/vuejs/vitepress) [![Codecov][codecov-image]][codecov-url] [![bundle size][bundlephobia-image]][bundlephobia-url]
 
 [npm-image]: http://img.shields.io/npm/v/@antd-tiny-vue/cssinjs.svg?style=flat-square
 [npm-url]: http://npmjs.org/package/@antd-tiny-vue/cssinjs
