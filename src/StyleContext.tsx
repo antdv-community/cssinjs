@@ -106,6 +106,7 @@ export const useStyleProvider = (props: StyleProviderProps) => {
 }
 
 export const StyleProvider = defineComponent({
+  name: 'StyleProvider',
   props: {
     autoClear: Boolean,
     mock: String as PropType<StyleContextProps['mock']>,
@@ -127,12 +128,10 @@ export const StyleProvider = defineComponent({
     },
   },
   setup(props, ctx) {
-    const context = reactive(useStyleProvider(props))
-    provide(StyleContextKey, context as StyleProviderProps)
+    provide(StyleContextKey, props)
     return () => ctx.slots.default?.()
   },
 })
-StyleProvider.displayName = 'StyleProvider'
 
 export default {
   useStyleInject,
