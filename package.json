@@ -1,7 +1,10 @@
 {
   "name": "@antd-tiny-vue/cssinjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "aibayanyu",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "publishConfig": {
@@ -18,9 +21,6 @@
     "test:u":"vitest -u",
     "coverage": "vitest --coverage"
   },
-  "keywords": [],
-  "author": "aibayanyu",
-  "license": "MIT",
   "peerDependencies": {
     "vue": "^3.2.0"
   },
