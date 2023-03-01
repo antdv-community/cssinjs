@@ -18,6 +18,7 @@ import {
   CSS_IN_JS_INSTANCE_ID,
   useStyleInject,
 } from '../StyleContext'
+import type { MaybeComputedRef } from '../util'
 import { supportLayer } from '../util'
 import canUseDom from '../utils/canUseDom'
 import { removeCSS, updateCSS } from '../utils/dynamicCSS'
@@ -289,7 +290,7 @@ function Empty() {
  * Register a style to the global style sheet.
  */
 export default function useStyleRegister(
-  info: Ref<{
+  info: MaybeComputedRef<{
     theme: Theme<any, any>
     token: any
     path: string[]
