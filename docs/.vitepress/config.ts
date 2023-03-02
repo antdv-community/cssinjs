@@ -22,5 +22,8 @@ export default defineConfig({
         link: '/auto-clear',
       },
     ],
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/antd-tiny-vue/cssinjs' },
+    ],
   },
 })
