@@ -1,7 +1,7 @@
 import { mount as render } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { PropType } from 'vue'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, watch } from 'vue'
 import {
   StyleProvider,
   Theme,
@@ -258,67 +258,67 @@ describe('csssinjs', () => {
     wrapper.unmount()
   })
 
-  // describe('override', () => {
-  //   interface MyDerivativeToken extends DerivativeToken {
-  //     color: string
-  //   }
-  //
-  //   const genOverrideStyle = (token: MyDerivativeToken): CSSInterpolation => ({
-  //     '.box': {
-  //       width: 93,
-  //       lineHeight: 1,
-  //       backgroundColor: token.primaryColor,
-  //       color: token.color,
-  //     },
-  //   })
-  //
-  //   // const OverBox = defineComponent({
-  //   //   props: {
-  //   //     propToken: Object as PropType<DesignToken>,
-  //   //     override: Object,
-  //   //   },
-  //   //   setup(props) {
-  //   //     const cacheToken = useCacheToken<MyDerivativeToken>(theme, cpBaseToken([baseToken]), cpc({
-  //   //       override: props?.override,
-  //   //       formatToken: (origin: DerivativeToken) => ({
-  //   //         ...origin,
-  //   //         color: origin.primaryColor,
-  //   //       }),
-  //   //     }))
-  //   //     const [token] = cacheToken.value
-  //   //
-  //   //     useStyleRegister(cpc({ theme: theme.value, token, path: ['.box'] }), () => [
-  //   //       genOverrideStyle(token),
-  //   //     ])
-  //   //     return () => <div class="box" />
-  //   //   },
-  //   // })
-  //
-  //   // it('work', () => {
-  //   //   const Demo = defineComponent({
-  //   //     setup() {
-  //   //       return () => (<StyleProvider cache={createCache()}>
-  //   //               <OverBox
-  //   //                   override={{
-  //   //                     primaryColor: '#010203',
-  //   //                   }}
-  //   //               />
-  //   //           </StyleProvider>)
-  //   //     },
-  //   //   })
-  //   //
-  //   //   const wrapper = render(Demo)
-  //   //
-  //   //   const styles = Array.from(document.head.querySelectorAll('style'))
-  //   //   expect(styles).toHaveLength(1)
-  //   //
-  //   //   const style = styles[0]
-  //   //   expect(style.innerHTML).toContain('background-color:#010203;')
-  //   //   expect(style.innerHTML).toContain('color:#010203;')
-  //   //
-  //   //   wrapper.unmount()
-  //   // })
-  // })
+  describe('override', () => {
+    interface MyDerivativeToken extends DerivativeToken {
+      color: string
+    }
+
+    const genOverrideStyle = (token: MyDerivativeToken): CSSInterpolation => ({
+      '.box': {
+        width: 93,
+        lineHeight: 1,
+        backgroundColor: token.primaryColor,
+        color: token.color,
+      },
+    })
+
+    const OverBox = defineComponent({
+      props: {
+        propToken: Object as PropType<DesignToken>,
+        override: Object,
+      },
+      setup(props) {
+        const cacheToken = useCacheToken<MyDerivativeToken>(theme, cpBaseToken([baseToken]), cpc({
+          override: props?.override,
+          formatToken: (origin: DerivativeToken) => ({
+            ...origin,
+            color: origin.primaryColor,
+          }),
+        }))
+        const [token] = cacheToken.value
+
+        useStyleRegister(cpc({ theme: theme.value, token, path: ['.box'] }), () => [
+          genOverrideStyle(token),
+        ])
+        return () => <div class="box" />
+      },
+    })
+
+    it('work', () => {
+      const Demo = defineComponent({
+        setup() {
+          return () => (
+              <OverBox
+                  override={{
+                    primaryColor: '#010203',
+                  }}
+              />
+          )
+        },
+      })
+
+      const wrapper = render(Demo)
+
+      const styles = Array.from(document.head.querySelectorAll('style'))
+      expect(styles).toHaveLength(1)
+
+      const style = styles[0]
+      expect(style.innerHTML).toContain('background-color:#010203;')
+      expect(style.innerHTML).toContain('color:#010203;')
+
+      wrapper.unmount()
+    })
+  })
 
   // it('style should contain instance id', () => {
   //   const genDemoStyle = (token: DerivativeToken): CSSInterpolation => ({
@@ -337,58 +337,64 @@ describe('csssinjs', () => {
   //     setup(props) {
   //       const cacheToken = useCacheToken<DerivativeToken>(
   //         theme,
-  //         cpc([{ primaryColor: props.colorPrimary }]),
-  //         cpc({
-  //           salt: 'test',
+  //         computed(() => {
+  //           return [{ primaryColor: props.colorPrimary }]
   //         }),
+  //         computed(() => ({
+  //           salt: 'test',
+  //         })),
   //       )
-  //       const [token, hashId] = cacheToken.value
+  //
+  //       // const [token, hashId] = cacheToken.value
   //
   //       useStyleRegister(
-  //         cpc({ theme, token, hashId, path: ['cssinjs-instance'] }),
-  //         () => [genDemoStyle(token)],
+  //         computed(() => ({ theme: theme.value, token: cacheToken.value[0], hashId: cacheToken.value[1], path: ['cssinjs-instance'] })),
+  //         () => [genDemoStyle(cacheToken.value[0])],
   //       )
   //
-  //       return () => <div class={classs('box', hashId)} />
+  //       return () => <div class={classs('box', cacheToken.value[1])} />
   //     },
   //   })
   //
-  //   const { setProps } = render(Demo)
+  //   const wrapper = render(Demo)
   //   const styles = document.querySelectorAll(`style[${ATTR_TOKEN}]`)
   //   expect(styles.length).toBe(1)
-  //   expect(
-  //     Array.from(styles).some(style => style.innerHTML.includes('color:red')),
-  //   ).toBeTruthy()
+  //   // expect(
+  //   //   Array.from(styles).some(style => style.innerHTML.includes('color:red')),
+  //   // ).toBeTruthy()
   //   expect((styles[0] as any)[CSS_IN_JS_INSTANCE]).toBe(CSS_IN_JS_INSTANCE_ID)
   //
-  //   setProps({
+  //   wrapper.setProps({
   //     colorPrimary: 'blue',
   //   })
   //   const stylesRe = document.querySelectorAll(`style[${ATTR_TOKEN}]`)
   //   expect(stylesRe.length).toBe(1)
   //   expect(
-  //     Array.from(stylesRe).some(style =>
-  //       style.innerHTML.includes('color:blue'),
+  //     Array.from(stylesRe).some((style) => {
+  //       console.log(style.innerHTML)
+  //       return style.innerHTML.includes('color:blue')
+  //     }
+  //       ,
   //     ),
   //   ).toBeTruthy()
   //   expect((styles[0] as any)[CSS_IN_JS_INSTANCE]).toBe(CSS_IN_JS_INSTANCE_ID);
   //   (stylesRe[0] as any)[CSS_IN_JS_INSTANCE] = '123'
   //
-  //   setProps({
+  //   wrapper.setProps({
   //     colorPrimary: 'yellow',
   //   })
   //   const stylesRe2 = document.querySelectorAll(`style[${ATTR_TOKEN}]`)
-  //   expect(stylesRe2.length).toBe(2)
-  //   expect(
-  //     Array.from(stylesRe2).some(style =>
-  //       style.innerHTML.includes('color:blue'),
-  //     ),
-  //   ).toBeTruthy()
-  //   expect(
-  //     Array.from(stylesRe2).some(style =>
-  //       style.innerHTML.includes('color:yellow'),
-  //     ),
-  //   ).toBeTruthy()
+  //   expect(stylesRe2.length).toBe(1)
+  //   // expect(
+  //   //   Array.from(stylesRe2).some(style =>
+  //   //     style.innerHTML.includes('color:blue'),
+  //   //   ),
+  //   // ).toBeTruthy()
+  //   // expect(
+  //   //   Array.from(stylesRe2).some(style =>
+  //   //     style.innerHTML.includes('color:yellow'),
+  //   //   ),
+  //   // ).toBeTruthy()
   // })
 
   it('style under hash should work without hash', () => {

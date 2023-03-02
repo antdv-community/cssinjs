@@ -5,7 +5,22 @@ export default defineConfig({
   description: 'antdv-cssinjs',
   themeConfig: {
     sidebar: [
-
+      {
+        text: 'Button和Spin实现',
+        link: '/comp',
+      },
+      {
+        text: '基本用法',
+        link: '/basic',
+      },
+      {
+        text: '动画',
+        link: '/animation',
+      },
+      {
+        text: 'AutoClear',
+        link: '/auto-clear',
+      },
     ],
   },
 })
