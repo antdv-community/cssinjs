@@ -2,8 +2,8 @@ import hash from '@emotion/hash'
 import type * as CSS from 'csstype'
 import unitless from '@emotion/unitless'
 import { compile, serialize, stringify } from 'stylis'
-import type { Ref, VNodeChild } from 'vue'
-import { computed } from 'vue'
+import type { ComponentOptionsMixin, DefineComponent, Ref, VNodeChild } from 'vue'
+import { computed, defineComponent } from 'vue'
 import type { Theme, Transformer } from '..'
 import type Cache from '../Cache'
 import type Keyframes from '../Keyframes'
@@ -286,6 +286,10 @@ function Empty() {
   return null
 }
 
+export interface StyleRegisterOpt {
+  sfc?: boolean
+}
+
 /**
  * Register a style to the global style sheet.
  */
@@ -298,7 +302,8 @@ export default function useStyleRegister(
     layer?: string
   }>,
   styleFn: () => CSSInterpolation,
-) {
+  opt?: StyleRegisterOpt,
+): StyleRegisterOpt['sfc'] extends true ? DefineComponent : ((node: VueNode) => VueNode) {
   const styleContext = useStyleInject()
 
   const tokenKey = computed(() => info.value.token._tokenKey as string)
@@ -369,6 +374,38 @@ export default function useStyleRegister(
         removeCSS(styleId, { mark: ATTR_MARK })
     },
   )
+  if (opt?.sfc === true) {
+    return defineComponent({
+      name: 'StyleRegister',
+      inheritAttrs: false,
+      setup(_, { slots }) {
+        return () => {
+          let styleNode: VueNode
+          if (!styleContext.ssrInline || isMergedClientSide || !styleContext.defaultCache) {
+            styleNode = <Empty />
+          }
+          else {
+            styleNode = (
+                <style
+                    {...{
+                      [ATTR_TOKEN]: cacheStyle.value[1],
+                      [ATTR_MARK]: cacheStyle.value[2],
+                    }}
+                    innerHTML={cacheStyle.value[0]}
+                />
+            )
+          }
+
+          return (
+              <>
+                {styleNode}
+                {slots.default?.()}
+              </>
+          )
+        }
+      },
+    }) as any
+  }
 
   return (node: VueNode) => {
     let styleNode: VueNode

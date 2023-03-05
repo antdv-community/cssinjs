@@ -23,6 +23,7 @@ export default defineConfig({
       fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
   },
+  // @ts-expect-error this is tested
   test: {
     globals: true,
     environment: 'jsdom',
