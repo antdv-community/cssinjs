@@ -1,8 +1,23 @@
 {
   "name": "@antd-tiny-vue/cssinjs",
-  "version": "0.0.5",
-  "description": "",
-  "keywords": [],
+  "version": "0.0.6",
+  "description": "Component level cssinjs resolution for antd in vue",
+  "keywords": [
+    "antd",
+    "ant-design",
+    "ant-design-vue",
+    "cssinjs",
+    "css",
+    "@ant-design/cssinjs"
+  ],
+  "homepage": "https://github.com/antd-tiny-vue/cssinjs",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:antd-tiny-vue/cssinjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/antd-tiny-vue/cssinjs/issues"
+  },
   "license": "MIT",
   "author": "aibayanyu",
   "main": "dist/index.js",
