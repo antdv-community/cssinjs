@@ -300,6 +300,7 @@ export default function useStyleRegister(
     path: string[]
     hashId?: string
     layer?: string
+    nonce?: string | (() => string)
   }>,
   styleFn: () => CSSInterpolation,
   opt?: StyleRegisterOpt,
@@ -323,7 +324,7 @@ export default function useStyleRegister(
     () => {
       const styleObj = styleFn()
       const { hashPriority, container, transformers, linters } = styleContext
-      const { path, hashId, layer } = info.value
+      const { path, hashId, layer, nonce } = info.value
       const [parsedStyle, effectStyle] = parseStyle(styleObj, {
         hashId,
         hashPriority,
@@ -336,11 +337,17 @@ export default function useStyleRegister(
       const styleId = uniqueHash(fullPath.value, styleStr)
 
       if (isMergedClientSide) {
-        const style = updateCSS(styleStr, styleId, {
+        const mergedCSSConfig: Parameters<typeof updateCSS>[2] = {
           mark: ATTR_MARK,
           prepend: 'queue',
           attachTo: container,
-        });
+        }
+        const nonceStr = typeof nonce === 'function' ? nonce() : nonce
+
+        if (nonceStr)
+          mergedCSSConfig.csp = { nonce: nonceStr }
+
+        const style = updateCSS(styleStr, styleId, mergedCSSConfig);
 
         (style as any)[CSS_IN_JS_INSTANCE] = CSS_IN_JS_INSTANCE_ID
 
@@ -357,11 +364,7 @@ export default function useStyleRegister(
             globalEffectStyleKeys.add(effectKey)
 
             // Inject
-            updateCSS(normalizeStyle(effectStyle[effectKey]), `_effect-${effectKey}`, {
-              mark: ATTR_MARK,
-              prepend: 'queue',
-              attachTo: container,
-            })
+            updateCSS(normalizeStyle(effectStyle[effectKey]), `_effect-${effectKey}`, mergedCSSConfig)
           }
         })
       }
