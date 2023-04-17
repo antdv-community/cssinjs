@@ -8,6 +8,7 @@ export default defineConfig({
     dts(),
   ],
   build: {
+    minify: false,
     rollupOptions: {
       external: [
         '@emotion/hash',
