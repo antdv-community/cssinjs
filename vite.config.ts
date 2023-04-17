@@ -11,7 +11,6 @@ export default defineConfig({
     minify: false,
     rollupOptions: {
       external: [
-        '@emotion/hash',
         '@emotion/unitless',
         'csstype',
         'stylis',
