@@ -24,7 +24,7 @@ function splitValues(
         brackets += item.split('(').length - 1
       }
       else if (item.includes(')')) {
-        temp += item
+        temp += ` ${item}`
         brackets -= item.split(')').length - 1
         if (brackets === 0) {
           list.push(temp)
@@ -32,7 +32,7 @@ function splitValues(
         }
       }
       else if (brackets > 0) {
-        temp += item
+        temp += ` ${item}`
       }
       else {
         list.push(item)
