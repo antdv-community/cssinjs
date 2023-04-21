@@ -1,7 +1,7 @@
 import hash from '@emotion/hash'
 import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
-import { ATTR_TOKEN, CSS_IN_JS_INSTANCE, CSS_IN_JS_INSTANCE_ID } from '../StyleContext'
+import { ATTR_TOKEN, CSS_IN_JS_INSTANCE, useStyleInject } from '../StyleContext'
 import type Theme from '../theme/Theme'
 import { flattenToken, token2key } from '../util'
 import useGlobalCache from './useGlobalCache'
@@ -37,19 +37,19 @@ function recordCleanToken(tokenKey: string) {
   tokenKeys.set(tokenKey, (tokenKeys.get(tokenKey) || 0) + 1)
 }
 
-function removeStyleTags(key: string) {
+function removeStyleTags(key: string, instanceId: string) {
   if (typeof document !== 'undefined') {
     const styles = document.querySelectorAll(`style[${ATTR_TOKEN}="${key}"]`)
 
     styles.forEach((style) => {
-      if ((style as any)[CSS_IN_JS_INSTANCE] === CSS_IN_JS_INSTANCE_ID)
+      if ((style as any)[CSS_IN_JS_INSTANCE] === instanceId)
         style.parentNode?.removeChild(style)
     })
   }
 }
 
 // Remove will check current keys first
-function cleanTokenStyle(tokenKey: string) {
+function cleanTokenStyle(tokenKey: string, instanceId: string) {
   tokenKeys.set(tokenKey, (tokenKeys.get(tokenKey) || 0) - 1)
 
   const tokenKeyList = Array.from(tokenKeys.keys())
@@ -61,7 +61,7 @@ function cleanTokenStyle(tokenKey: string) {
 
   if (cleanableKeyList.length < tokenKeyList.length) {
     cleanableKeyList.forEach((key) => {
-      removeStyleTags(key)
+      removeStyleTags(key, instanceId)
       tokenKeys.delete(key)
     })
   }
@@ -79,6 +79,8 @@ export default function useCacheToken<DerivativeToken = object, DesignToken = De
   tokens: Ref<Partial<DesignToken>[]>,
   option: Ref<Option<DerivativeToken>> = ref({}),
 ) {
+  const contextProps = useStyleInject()
+
   // Basic - We do basic cache here
   const mergedToken = computed(() => {
     return Object.assign({}, ...tokens.value)
@@ -126,7 +128,7 @@ export default function useCacheToken<DerivativeToken = object, DesignToken = De
     },
     (cache) => {
       // Remove token will remove all related style
-      cleanTokenStyle(cache[0]._tokenKey)
+      cleanTokenStyle(cache[0]._tokenKey, contextProps.cache.instanceId)
     },
   )
 }

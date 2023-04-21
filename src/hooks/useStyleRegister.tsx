@@ -2,7 +2,7 @@ import hash from '@emotion/hash'
 import type * as CSS from 'csstype'
 import unitless from '@emotion/unitless'
 import { compile, serialize, stringify } from 'stylis'
-import type { ComponentOptionsMixin, DefineComponent, Ref, VNodeChild } from 'vue'
+import type { DefineComponent, VNodeChild } from 'vue'
 import { computed, defineComponent } from 'vue'
 import type { Theme, Transformer } from '..'
 import type Cache from '../Cache'
@@ -15,7 +15,6 @@ import {
   ATTR_MARK,
   ATTR_TOKEN,
   CSS_IN_JS_INSTANCE,
-  CSS_IN_JS_INSTANCE_ID,
   useStyleInject,
 } from '../StyleContext'
 import type { MaybeComputedRef } from '../util'
@@ -28,6 +27,7 @@ export type VueNode = VNodeChild
 const isClientSide = canUseDom()
 
 const SKIP_CHECK = '_skip_check_'
+const MULTI_VALUE = '_multi_value_'
 
 export type CSSProperties = Omit<CSS.PropertiesFallback<number | string>, 'animationName'> & {
   animationName?: CSS.PropertiesFallback<number | string>['animationName'] | Keyframes
@@ -39,6 +39,7 @@ export type CSSPropertiesWithMultiValues = {
   | Extract<CSSProperties[K], string>[]
   | {
     [SKIP_CHECK]: boolean
+    [MULTI_VALUE]?: boolean
     value: CSSProperties[K] | Extract<CSSProperties[K], string>[]
   };
 }
@@ -65,7 +66,11 @@ export function normalizeStyle(styleStr: string) {
 }
 
 function isCompoundCSSProperty(value: CSSObject[string]) {
-  return typeof value === 'object' && value && SKIP_CHECK in value
+  return (
+    typeof value === 'object'
+      && value
+      && (SKIP_CHECK in value || MULTI_VALUE in value)
+  )
 }
 
 // 注入 hash 值
@@ -160,7 +165,7 @@ export const parseStyle = (
   const flattenStyleList = flattenList(
     Array.isArray(interpolation) ? interpolation : [interpolation],
   )
-
+  console.log('flattenStyleList', flattenStyleList)
   flattenStyleList.forEach((originStyle) => {
     // Only root level can use raw string
     const style: CSSObject = typeof originStyle === 'string' && !root ? {} : originStyle
@@ -227,36 +232,60 @@ export const parseStyle = (
           styleStr += `${mergedKey}${parsedStr}`
         }
         else {
+          function appendStyle(cssKey: string, cssValue: any) {
+            if (
+              process.env.NODE_ENV !== 'production'
+                && (typeof value !== 'object' || !(value as any)?.[SKIP_CHECK])
+            ) {
+              [contentQuotesLinter, hashedAnimationLinter, ...linters].forEach(
+                linter =>
+                  linter(cssKey, cssValue, { path, hashId, parentSelectors }),
+              )
+            }
+
+            // 如果是样式则直接插入
+            const styleName = cssKey.replace(
+              /[A-Z]/g,
+              match => `-${match.toLowerCase()}`)
+            // Auto suffix with px
+            let formatValue = cssValue
+            if (
+              !unitless[cssKey]
+                && typeof formatValue === 'number'
+                && formatValue !== 0
+            )
+              formatValue = `${formatValue}px`
+
+            // handle animationName & Keyframe value
+            if (
+              cssKey === 'animationName'
+                && (cssValue as Keyframes)?._keyframe
+            ) {
+              parseKeyframes(cssValue as Keyframes)
+              formatValue = (cssValue as Keyframes).getName(hashId)
+            }
+            styleStr += `${styleName}:${formatValue};`
+          }
+
           const actualValue = (value as any)?.value ?? value
           if (
-            process.env.NODE_ENV !== 'production'
-            && (typeof value !== 'object' || !(value as any)?.[SKIP_CHECK])
+            typeof value === 'object'
+              && (value as any)?.[MULTI_VALUE]
+              && Array.isArray(actualValue)
           ) {
-            [contentQuotesLinter, hashedAnimationLinter, ...linters].forEach(linter =>
-              linter(key, actualValue, { path, hashId, parentSelectors }),
-            )
+            actualValue.forEach((item) => {
+              appendStyle(key, item)
+            })
           }
-
-          // 如果是样式则直接插入
-          const styleName = key.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)
-
-          // Auto suffix with px
-          let formatValue = actualValue
-          if (!unitless[key] && typeof formatValue === 'number' && formatValue !== 0)
-            formatValue = `${formatValue}px`
-
-          // handle animationName & Keyframe value
-          if (key === 'animationName' && (value as Keyframes)?._keyframe) {
-            parseKeyframes(value as Keyframes)
-            formatValue = (value as Keyframes).getName(hashId)
+          else {
+            appendStyle(key, actualValue)
           }
-
-          styleStr += `${styleName}:${formatValue};`
         }
       })
     }
   })
 
+  console.log('styleStr', styleStr)
   if (!root) {
     styleStr = `{${styleStr}}`
   }
@@ -323,6 +352,7 @@ export default function useStyleRegister(
     // Create cache if needed
     () => {
       const styleObj = styleFn()
+      console.log(styleObj)
       const { hashPriority, container, transformers, linters } = styleContext
       const { path, hashId, layer, nonce } = info.value
       const [parsedStyle, effectStyle] = parseStyle(styleObj, {
@@ -349,7 +379,7 @@ export default function useStyleRegister(
 
         const style = updateCSS(styleStr, styleId, mergedCSSConfig);
 
-        (style as any)[CSS_IN_JS_INSTANCE] = CSS_IN_JS_INSTANCE_ID
+        (style as any)[CSS_IN_JS_INSTANCE] = styleContext.cache.instanceId
 
         // Used for `useCacheToken` to remove on batch when token removed
         style.setAttribute(ATTR_TOKEN, tokenKey.value)

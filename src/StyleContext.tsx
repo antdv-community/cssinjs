@@ -1,5 +1,5 @@
 import type { InjectionKey, PropType, Ref } from 'vue'
-import { computed, defineComponent, inject, provide, reactive, unref } from 'vue'
+import { computed, defineComponent, inject, provide, unref } from 'vue'
 import CacheEntity from './Cache'
 import type { Linter } from './linters'
 import type { Transformer } from './transformers/interface'
@@ -10,16 +10,16 @@ export const ATTR_DEV_CACHE_PATH = 'data-dev-cache-path'
 
 // Mark css-in-js instance in style element
 export const CSS_IN_JS_INSTANCE = '__cssinjs_instance__'
-export const CSS_IN_JS_INSTANCE_ID = Math.random().toString(12).slice(2)
 
 export function createCache() {
+  const cssinjsInstanceId = Math.random().toString(12).slice(2)
   if (typeof document !== 'undefined' && document.head && document.body) {
     const styles = document.body.querySelectorAll(`style[${ATTR_MARK}]`) || []
     const { firstChild } = document.head
 
     Array.from(styles).forEach((style) => {
       (style as any)[CSS_IN_JS_INSTANCE]
-          = (style as any)[CSS_IN_JS_INSTANCE] || CSS_IN_JS_INSTANCE_ID
+          = (style as any)[CSS_IN_JS_INSTANCE] || cssinjsInstanceId
 
       // Not force move if no head
       document.head.insertBefore(style, firstChild)
@@ -30,7 +30,7 @@ export function createCache() {
     Array.from(document.querySelectorAll(`style[${ATTR_MARK}]`)).forEach((style) => {
       const hash = style.getAttribute(ATTR_MARK)!
       if (styleHash[hash]) {
-        if ((style as any)[CSS_IN_JS_INSTANCE] === CSS_IN_JS_INSTANCE_ID)
+        if ((style as any)[CSS_IN_JS_INSTANCE] === cssinjsInstanceId)
           style.parentNode?.removeChild(style)
       }
       else {
@@ -39,7 +39,7 @@ export function createCache() {
     })
   }
 
-  return new CacheEntity()
+  return new CacheEntity(cssinjsInstanceId)
 }
 
 export type HashPriority = 'low' | 'high'
@@ -74,10 +74,12 @@ export interface StyleContextProps {
 const StyleContextKey: InjectionKey<StyleContextProps> = Symbol('StyleContextKey')
 
 export type StyleProviderProps = Partial<StyleContextProps> | Ref<Partial<StyleContextProps>>
+
+const cache = createCache()
 export const useStyleInject = () => {
   return inject(StyleContextKey, {
     hashPriority: 'low',
-    cache: createCache(),
+    cache,
     defaultCache: true,
   })
 }

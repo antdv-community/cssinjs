@@ -26,11 +26,13 @@ export default defineComponent({
     const defaultCls = `${prefixCls}-default`
     const primaryCls = `${prefixCls}-primary`
     const ghostCls = `${prefixCls}-ghost`
-    const wrapSSR = useStyleRegister(registerParam, () => [
-      genDefaultButtonStyle(defaultCls, token.value),
-      genPrimaryButtonStyle(primaryCls, token.value),
-      genGhostButtonStyle(ghostCls, token.value),
-    ])
+    const wrapSSR = useStyleRegister(registerParam, () => {
+      return [
+        genDefaultButtonStyle(defaultCls, token.value),
+        genPrimaryButtonStyle(primaryCls, token.value),
+        genGhostButtonStyle(ghostCls, token.value),
+      ]
+    })
     return () => {
       const typeCls: any = {
         [defaultCls]: props.type === 'default',
