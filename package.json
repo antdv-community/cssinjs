@@ -1,6 +1,6 @@
 {
   "name": "@antd-tiny-vue/cssinjs",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Component level cssinjs resolution for antd in vue",
   "keywords": [
     "antd",
