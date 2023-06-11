@@ -165,7 +165,6 @@ export const parseStyle = (
   const flattenStyleList = flattenList(
     Array.isArray(interpolation) ? interpolation : [interpolation],
   )
-  console.log('flattenStyleList', flattenStyleList)
   flattenStyleList.forEach((originStyle) => {
     // Only root level can use raw string
     const style: CSSObject = typeof originStyle === 'string' && !root ? {} : originStyle
@@ -285,7 +284,6 @@ export const parseStyle = (
     }
   })
 
-  console.log('styleStr', styleStr)
   if (!root) {
     styleStr = `{${styleStr}}`
   }
@@ -352,7 +350,6 @@ export default function useStyleRegister(
     // Create cache if needed
     () => {
       const styleObj = styleFn()
-      console.log(styleObj)
       const { hashPriority, container, transformers, linters } = styleContext
       const { path, hashId, layer, nonce } = info.value
       const [parsedStyle, effectStyle] = parseStyle(styleObj, {
